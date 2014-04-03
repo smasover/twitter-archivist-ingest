@@ -1,3 +1,9 @@
+# This software is available under the terms of the Educational Community License, Version 2.0 (ECL 2.0).
+#
+# All modules are Copyright 2014 The Regents of the University of California, Berkeley ("Berkeley").
+#
+# The text of the ECL license is reproduced in the file LICENSE.txt.
+
 import sys
 import os
 import json
@@ -22,7 +28,7 @@ dictOfFilesFromWhichDuplicatesRemoved = {}
 listOfTweetIdsPoppedFromDeduplicatedJSON = []
 listOfCleanedTweetFilesDiscardedAsUnreadableJSON = []
 # some hard-coded directory names:
-basePath = 'D:\\var\\tmp\\python-ta\\data\\'
+basePath = 'C:\\var\\tmp\\python-ta\\data\\'
 rawInputDir = basePath + 'raw'
 cleanTrimmedJsonDir = basePath + 'clean-trimmed'
 deduplicatedJsonDir = basePath + 'deduped'
@@ -70,13 +76,13 @@ def tainhale(filename):
   global statusLogFN
 
   start_time = time.time()
-  f = open(filename,'rU')
+  f = open(filename, 'rU')
   #
   # focusbegin is the place in the file to begin "inhaling" (no reason this should be other than zero, i.e., first char)
   # focussize is the number of characters to read in each "inhalation" ... set to > the largest Tweet
   #
   focusbegin = 0
-  focussize =10000
+  focussize = 10000
   #
   # The first tweet in a Twitter Archivist file begins with the second open brace ({}:
   #    {"statuses":[{"metadata": ...
@@ -103,7 +109,7 @@ def tainhale(filename):
     if nextTweetOpenIndex == -1:
       # print 'File ended with a complete tweet!'
       break
-    nextTweetCloseIndex = indexClosingBrace(focus,nextTweetOpenIndex)
+    nextTweetCloseIndex = indexClosingBrace(focus, nextTweetOpenIndex)
     if nextTweetCloseIndex != -1:
       # print 'Cumulative Index: ' + str(cumulativeIndex)
       # print 'next CLOSE, next OPEN, CLOSE - OPEN: ' + str(nextTweetCloseIndex)  + ', ' + str(nextTweetOpenIndex) + ', ' + str(nextTweetCloseIndex - nextTweetOpenIndex)
@@ -115,7 +121,7 @@ def tainhale(filename):
       #
       cumulativeIndex += (nextTweetCloseIndex - nextTweetOpenIndex + 2)
       tweetCount += 1
-      nextTweet = focus[nextTweetOpenIndex:(nextTweetCloseIndex+1)]
+      nextTweet = focus[nextTweetOpenIndex:(nextTweetCloseIndex + 1)]
       # print 'Tweet #' + str(tweetCount) + ': ' + str(nextTweetOpenIndex) + ',' + str(nextTweetCloseIndex) + ' | ' + nextTweet
       #
       # the following try: block will raise an error (ValueError) if the nextTweet is malformed; this is
@@ -131,12 +137,13 @@ def tainhale(filename):
       # print 'Incomplete tweet at end of input file!'
       break
     # print 'Cumulative index = ' + str(cumulativeIndex) + '; tweetCount = ' + str(tweetCount) + '[filename = ' + filename + ']'
-    f.seek(cumulativeIndex,0)
+    f.seek(cumulativeIndex, 0)
     focus = f.read(focussize)
   f.close()
   end_time = time.time()
   totalTweetsInCleanData = totalTweetsInCleanData + len(tweets)
-  printAndLog('Elapsed time to parse ' + str(len(tweets)) + ' tweets: ' + str(end_time - start_time) + ' seconds.',statusLogFN)
+  printAndLog('Elapsed time to parse ' + str(len(tweets)) + ' tweets: ' + str(end_time - start_time) + ' seconds.',
+              statusLogFN)
   return tweets
 
 def validateTweet(candidateTweet):
@@ -184,9 +191,9 @@ def validateTweet(candidateTweet):
       isValid = False
       indexIcky = candidateTweet.find('\\","')
       if indexIcky >= 50:
-        print 'Tweet: ' + candidateTweet[(indexIcky-50):]
+        print 'Tweet: ' + candidateTweet[(indexIcky - 50):]
       else:
-        print 'Tweet: ' + candidateTweet[:(indexIcky+30)]
+        print 'Tweet: ' + candidateTweet[:(indexIcky + 30)]
       print 'The tweet printed directly before this line has malforming escaped field-ending double-quotation-mark - tweet discarded...'
     if not (',"id":' in candidateTweet):
       isValid = False
@@ -227,7 +234,7 @@ def validateTweet(candidateTweet):
   return isValid
 
 def indexSecondOpenBrace(focus):
-  if  focus[0] != '{':
+  if focus[0] != '{':
     sys.exit('A Twitter Archivist file is expected to begin with an open brace ({). This file does not.')
   i = 1
   secondOBIndex = 0
@@ -252,7 +259,7 @@ def indexNextOpenBrace(focus):
     if obIndex == 0: obIndex = -1
   return obIndex
 
-def indexClosingBrace(focus,obIndex):
+def indexClosingBrace(focus, obIndex):
   i = obIndex
   numOpeningBraces = 0
   numClosingBraces = 0
@@ -273,13 +280,13 @@ def indexClosingBrace(focus,obIndex):
     if closingBraceIndex == 0: closingBraceIndex = -1
   return closingBraceIndex
 
-def saveListAsFile(list,filename):
+def saveListAsFile(list, filename):
   f = codecs.open(filename, 'aU', 'utf-8')
   for item in list:
     f.write(item + '\n')
   f.close
 
-def saveListAsFileJSON(list,filenameBase):
+def saveListAsFileJSON(list, filenameBase):
   global totalCleanDataFiles
   #
   # this file runs in a loop to save multiple files with a maximum number of tweets; purpose is to avoid having
@@ -288,12 +295,12 @@ def saveListAsFileJSON(list,filenameBase):
   i = 0
   j = 0
   k = 0
-  while (k+1) < len(list):
+  while (k + 1) < len(list):
     filename = filenameBase[0:filenameBase.find('.json')] + '_' + str(i) + '.json'
     f = codecs.open(filename, 'aU', 'utf-8')
     f.write('{"statuses":[')
     first = True
-    while (j < maxTweetsPerFile) and ((k+1) < len(list)):
+    while (j < maxTweetsPerFile) and ((k + 1) < len(list)):
       j += 1
       k += 1
       if first:
@@ -342,7 +349,7 @@ def parseSelectedTweetElementsFromCleanString(tweetAsString):
     #####################################
     # unix timestamp constructed for possible utility as an index in the resultant data set
     #####################################
-    ts_unix = calendar.timegm(time.strptime(ts,'%a %b %d %H:%M:%S +0000 %Y'))
+    ts_unix = calendar.timegm(time.strptime(ts, '%a %b %d %H:%M:%S +0000 %Y'))
     trimmedTweetAsString = trimmedTweetAsString + ',"timestamp_unix":' + str(ts_unix)
     #####################################
     # uid of user who tweeted this tweet
@@ -366,16 +373,22 @@ def parseSelectedTweetElementsFromCleanString(tweetAsString):
     # geographic location from which this tweet was sent
     #####################################
     if fullTweetAsJSON['statuses'][0]['geo'] != None:
-      this_geo_coordinates_as_string = '[' + (str(fullTweetAsJSON['statuses'][0]['geo']['coordinates'][0])) + ',' + (str(fullTweetAsJSON['statuses'][0]['geo']['coordinates'][1])) + ']'
-      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_geo":{"type":"' + fullTweetAsJSON['statuses'][0]['geo']['type'] + '","coordinates":' + this_geo_coordinates_as_string + '}'
+      this_geo_coordinates_as_string = '[' + (str(fullTweetAsJSON['statuses'][0]['geo']['coordinates'][0])) + ',' + (
+      str(fullTweetAsJSON['statuses'][0]['geo']['coordinates'][1])) + ']'
+      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_geo":{"type":"' + fullTweetAsJSON['statuses'][0]['geo'][
+        'type'] + '","coordinates":' + this_geo_coordinates_as_string + '}'
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_geo":null'
     #####################################
     # coordinates of location from which this tweet was sent
     #####################################
     if fullTweetAsJSON['statuses'][0]['coordinates'] != None:
-      this_coordinates_coordinates_as_string = '[' + (str(fullTweetAsJSON['statuses'][0]['coordinates']['coordinates'][0])) + ',' + (str(fullTweetAsJSON['statuses'][0]['coordinates']['coordinates'][1])) + ']'
-      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_coordinates":{"type":"' + fullTweetAsJSON['statuses'][0]['coordinates']['type'] + '","coordinates":' + this_coordinates_coordinates_as_string + '}'
+      this_coordinates_coordinates_as_string = '[' + (
+      str(fullTweetAsJSON['statuses'][0]['coordinates']['coordinates'][0])) + ',' + (str(
+        fullTweetAsJSON['statuses'][0]['coordinates']['coordinates'][1])) + ']'
+      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_coordinates":{"type":"' + \
+                             fullTweetAsJSON['statuses'][0]['coordinates'][
+                               'type'] + '","coordinates":' + this_coordinates_coordinates_as_string + '}'
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_coordinates":null'
     #####################################
@@ -387,13 +400,18 @@ def parseSelectedTweetElementsFromCleanString(tweetAsString):
     # thisTweetAsDict['tweet_place'] = tweets['statuses'][i]['place']
     if fullTweetAsJSON['statuses'][0]['place'] != None:
       thisTweetPlaceSelectedElementsAsDictInnards = '{"id":"' + fullTweetAsJSON['statuses'][0]['place']['id'] + '",' + \
-                                                      '"url":"' + fullTweetAsJSON['statuses'][0]['place']['url'] + '",' + \
-                                                      '"place_type":"' + fullTweetAsJSON['statuses'][0]['place']['place_type'] + '",' + \
-                                                      '"name":"' + fullTweetAsJSON['statuses'][0]['place']['name'] + '",' + \
-                                                      '"full_name":"' + fullTweetAsJSON['statuses'][0]['place']['full_name'] + '",' + \
-                                                      '"country_code":"' + fullTweetAsJSON['statuses'][0]['place']['country_code'] + '",' + \
-                                                      '"country":"' + fullTweetAsJSON['statuses'][0]['place']['country'] + '"' + \
-                                                      '}'
+                                                    '"url":"' + fullTweetAsJSON['statuses'][0]['place']['url'] + '",' + \
+                                                    '"place_type":"' + fullTweetAsJSON['statuses'][0]['place'][
+                                                      'place_type'] + '",' + \
+                                                    '"name":"' + fullTweetAsJSON['statuses'][0]['place'][
+                                                      'name'] + '",' + \
+                                                    '"full_name":"' + fullTweetAsJSON['statuses'][0]['place'][
+                                                      'full_name'] + '",' + \
+                                                    '"country_code":"' + fullTweetAsJSON['statuses'][0]['place'][
+                                                      'country_code'] + '",' + \
+                                                    '"country":"' + fullTweetAsJSON['statuses'][0]['place'][
+                                                      'country'] + '"' + \
+                                                    '}'
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_place":' + thisTweetPlaceSelectedElementsAsDictInnards
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_place":null'
@@ -401,27 +419,31 @@ def parseSelectedTweetElementsFromCleanString(tweetAsString):
     # uid of user to whom this tweet replies
     #####################################
     if fullTweetAsJSON['statuses'][0]['in_reply_to_user_id'] != None:
-      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_user_id":' + str(fullTweetAsJSON['statuses'][0]['in_reply_to_user_id'])
+      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_user_id":' + str(
+        fullTweetAsJSON['statuses'][0]['in_reply_to_user_id'])
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_user_id":null'
     #####################################
     # screen name of user to whom this tweet replies
     #####################################
     if fullTweetAsJSON['statuses'][0]['in_reply_to_screen_name'] != None:
-        trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_screen_name":"' + fullTweetAsJSON['statuses'][0]['in_reply_to_screen_name'] + '"'
+      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_screen_name":"' + \
+                             fullTweetAsJSON['statuses'][0]['in_reply_to_screen_name'] + '"'
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_screen_name":null'
     #####################################
     # id of tweet to which this tweet replies
     #####################################
     if fullTweetAsJSON['statuses'][0]['in_reply_to_status_id'] != None:
-      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_status_id":' + str(fullTweetAsJSON['statuses'][0]['in_reply_to_status_id'])
+      trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_status_id":' + str(
+        fullTweetAsJSON['statuses'][0]['in_reply_to_status_id'])
     else:
       trimmedTweetAsString = trimmedTweetAsString + ',"tweet_in_reply_to_status_id":null'
     #####################################
     # number of times this retweet (if > 0) has been retweeted as of time of this retweet; has not been retweeted if val = 0
     #####################################
-    trimmedTweetAsString = trimmedTweetAsString + ',"retweet_count":' + str(fullTweetAsJSON['statuses'][0]['retweet_count'])
+    trimmedTweetAsString = trimmedTweetAsString + ',"retweet_count":' + str(
+      fullTweetAsJSON['statuses'][0]['retweet_count'])
     #####################################
     # this tweet's hashtags
     #####################################
@@ -468,14 +490,14 @@ def cleanUserInputText(textAsInput):
   cleanText = textAsInput
   # the following line escapes instances of backslash in user input, which is killing json.load()
   #  in cases where the escaped character is not actually escapable (cf. allowed set on front page of json.org)
-  cleanText = cleanText.replace('\\','ESC-BKSLSH')
+  cleanText = cleanText.replace('\\', 'ESC-BKSLSH')
   #
-  cleanText = cleanText.replace('"','ESC-QUOT')
-  cleanText = cleanText.replace('\n',' ')
-  cleanText = cleanText.replace('\r',' ')
+  cleanText = cleanText.replace('"', 'ESC-QUOT')
+  cleanText = cleanText.replace('\n', ' ')
+  cleanText = cleanText.replace('\r', ' ')
   return cleanText
 
-def writeJSON(writableFileName,listOfListOfJSONElements):
+def writeJSON(writableFileName, listOfListOfJSONElements):
   global totalCleanDataFiles
   #
   # construct a filename for saved output from this function
@@ -486,7 +508,7 @@ def writeJSON(writableFileName,listOfListOfJSONElements):
   # print 'here is the suffix of file using a negative index number: ' + writableFileName[(writableFileName.find('.json') - len(writableFileName)):]
   # filenameSuffix = writableFileName[(writableFileName.find('.json') - len(writableFileName)):]
   # if filenameSuffix != '.json':
-    # print 'changing suffix...'
+  # print 'changing suffix...'
   #  writableFileName = writableFileName + '.json'
   # print 'filename to write: ' + writableFileName
   #
@@ -520,7 +542,7 @@ def writeJSON(writableFileName,listOfListOfJSONElements):
   print 'wrote file ' + writableFileName + ' containing ' + str(i) + ' tweets.'
   return
 
-def deduplicateTweets(sourceDir,targetDir):
+def deduplicateTweets(sourceDir, targetDir):
   # need a store of uniqueTweetIds ... as many as 300K as of 12/11/2013 -- start with a list, see if it fits (faster than file)
   # for each file in sourceDir, iterate through it and:
   #    load as json
@@ -545,11 +567,11 @@ def deduplicateTweets(sourceDir,targetDir):
   cleanedFilesList = os.listdir(sourceDir)
   i = 0
   for i in xrange(len(cleanedFilesList)):
-  # test with a few files:
-  # for i in [0,1,2]:
+    # test with a few files:
+    # for i in [0,1,2]:
     cleanedFN = sourceDir + '\\' + cleanedFilesList[i]
     # thisFile = codecs.open(cleanedFN, 'rU', 'utf-8')
-    thisFile = open(cleanedFN,'rU')
+    thisFile = open(cleanedFN, 'rU')
     try:
       theseTweets = json.load(thisFile)
       j = 0
@@ -580,7 +602,7 @@ def deduplicateTweets(sourceDir,targetDir):
       # now serialize and save the deduplicated JSON to the targetDir
       deduplicatedFN = targetDir + '\\' + cleanedFilesList[i]
       thisFileDeduplicated = codecs.open(deduplicatedFN, 'wU', 'utf-8')
-      json.dump(theseTweets,thisFileDeduplicated,ensure_ascii=False,encoding="utf-8")
+      json.dump(theseTweets, thisFileDeduplicated, ensure_ascii=False, encoding="utf-8")
       print 'File saved after removing ' + str(len(popList)) + ' duplicate tweets: ' + cleanedFilesList[i]
     except ValueError:
       print 'FAIL to json.load this file: ' + cleanedFilesList[i]
@@ -597,18 +619,19 @@ def getAllTweetIds(sourceDir):
   global logDir
   # get a list of Tweet Ids from all JSON files in a directory ... ASSUMED that all files are clean JSON containing
   #  tweets with 'id' fields!
-  resultsDict = iterateAndExtractSingleJSONelement(sourceDir,'id',True)
+  resultsDict = iterateAndExtractSingleJSONelement(sourceDir, 'id', True)
   allTweetIds = resultsDict['results']
   unreadableFilesList = resultsDict['unreadableFiles']
   unreadableFilesCount = resultsDict['unreadableFilesCount']
   print ' ----------------------------------- '
-  printAndLog('Completed ingestion of Tweet IDs in directory; found ' + str(len(allTweetIds)) + ' Tweet IDs.',statusLogFN)
-  printAndLog('Failed to json.load() this many files: ' + str(unreadableFilesCount),statusLogFN)
+  printAndLog('Completed ingestion of Tweet IDs in directory; found ' + str(len(allTweetIds)) + ' Tweet IDs.',
+              statusLogFN)
+  printAndLog('Failed to json.load() this many files: ' + str(unreadableFilesCount), statusLogFN)
   if unreadableFilesCount != 0:
     thisFN = 'dedupedFiles-UnreadableJSON.log'
     unreadableDedupedFilesLogFN = logDir + '\\' + thisFN
-    saveListAsFile(unreadableFilesList,unreadableDedupedFilesLogFN)
-    printAndLog('Deduplicated files unreadable as JSON in: ' + thisFN,statusLogFN)
+    saveListAsFile(unreadableFilesList, unreadableDedupedFilesLogFN)
+    printAndLog('Deduplicated files unreadable as JSON in: ' + thisFN, statusLogFN)
   print ' ----------------------------------- '
   return allTweetIds
 
@@ -616,35 +639,37 @@ def aggregateAllTweets(sourceDir):
   global logDir
   # get a list of all Tweets (text of) from all JSON files in a directory ... ASSUMED that all files are clean JSON containing
   #  tweets with 'text' fields!
-  resultsDict = iterateAndExtractSingleJSONelement(sourceDir,'text',False)
+  resultsDict = iterateAndExtractSingleJSONelement(sourceDir, 'text', False)
   allTweets = resultsDict['results']
   unreadableAggFilesList = resultsDict['unreadableFiles']
   unreadableAggFilesCount = resultsDict['unreadableFilesCount']
   print ' ----------------------------------- '
-  printAndLog('Completed ingestion of all Tweets in directory; found and aggregated ' + str(len(allTweets)) + ' Tweets.',statusLogFN)
-  printAndLog('Failed to json.load() this many files: ' + str(unreadableAggFilesCount),statusLogFN)
+  printAndLog(
+    'Completed ingestion of all Tweets in directory; found and aggregated ' + str(len(allTweets)) + ' Tweets.',
+    statusLogFN)
+  printAndLog('Failed to json.load() this many files: ' + str(unreadableAggFilesCount), statusLogFN)
   print ' ----------------------------------- '
   if unreadableAggFilesCount != 0:
     thisFN = 'dedupedFiles-UnreadableJSON-aggregationPhase.log'
     unreadableDedupedFilesLogFN = logDir + '\\' + thisFN
-    saveListAsFile(unreadableAggFilesList,unreadableDedupedFilesLogFN)
-    printAndLog('Deduplicated files unreadable as JSON in: ' + thisFN,statusLogFN)
+    saveListAsFile(unreadableAggFilesList, unreadableDedupedFilesLogFN)
+    printAndLog('Deduplicated files unreadable as JSON in: ' + thisFN, statusLogFN)
   return allTweets
 
-def iterateAndExtractSingleJSONelement(sourceDir,tweetElement,convertElementToString):
+def iterateAndExtractSingleJSONelement(sourceDir, tweetElement, convertElementToString):
   resultsList = []
   unreadableList = []
   unreadableCount = 0
   # read the filenames in the sourceDir
   filesList = os.listdir(sourceDir)
-  printAndLog('Iterating through this many files from directory' + sourceDir + ': ' + str(len(filesList)),statusLogFN)
+  printAndLog('Iterating through this many files from directory' + sourceDir + ': ' + str(len(filesList)), statusLogFN)
   i = 0
   for i in xrange(len(filesList)):
-  # test with a few files:
-  # for i in [0,1,2]:
+    # test with a few files:
+    # for i in [0,1,2]:
     cleanedFN = sourceDir + '\\' + filesList[i]
     # thisFile = codecs.open(cleanedFN, 'rU', 'utf-8')
-    thisFile = open(cleanedFN,'rU')
+    thisFile = open(cleanedFN, 'rU')
     thisFileAsString = thisFile.read()
     try:
       theseTweets = json.loads(thisFileAsString)
@@ -681,7 +706,7 @@ def iterateAndExtractSingleJSONelement(sourceDir,tweetElement,convertElementToSt
   resultsDict['results'] = resultsList
   return resultsDict
 
-def mergeJSONfiles(sourceDir,targetDir):
+def mergeJSONfiles(sourceDir, targetDir):
   unreadableList = []
   unreadableCount = 0
   totalSourceFilesReadCount = 0
@@ -689,7 +714,7 @@ def mergeJSONfiles(sourceDir,targetDir):
   #
   sourceJSONFilesList = os.listdir(sourceDir)
   sourceFilesStagedForReading = len(sourceJSONFilesList)
-  printAndLog('Number of files to be read from source directory: ' + str(sourceFilesStagedForReading),statusLogFN)
+  printAndLog('Number of files to be read from source directory: ' + str(sourceFilesStagedForReading), statusLogFN)
   targetFilenameBase = 'tweets_'
   targetFilenameCounter = 0
   targetJSONStructurePrefix = '{"statuses":['
@@ -705,7 +730,7 @@ def mergeJSONfiles(sourceDir,targetDir):
   for i in xrange(len(sourceJSONFilesList)):
     sourceFN = sourceDir + '\\' + sourceJSONFilesList[i]
     # thisFile = codecs.open(sourceFN, 'rU', 'utf-8')
-    thisFile = open(sourceFN,'rU')
+    thisFile = open(sourceFN, 'rU')
     # thisFileAsString = thisFile.read()
     try:
       totalSourceFilesReadCount += 1
@@ -739,7 +764,7 @@ def mergeJSONfiles(sourceDir,targetDir):
     # note that the second (OR) clause causes a write if the last source file has been read in
     #
     if ((k + maxTweetsPerFile >= maxTweetsPerAggregatedFile) or
-       (i+1 == sourceFilesStagedForReading)):
+          (i + 1 == sourceFilesStagedForReading)):
       #(not (i+1) in xrange(len(sourceJSONFilesList)))):
       #
       # write out target file
@@ -760,7 +785,7 @@ def mergeJSONfiles(sourceDir,targetDir):
         counter += 1
       f.write(targetJSONStructureSuffix)
       f.close()
-      print 'Completed writing >>> ' + str(counter) + ' <<< tweets to this file:'  + str(currentTargetFile)
+      print 'Completed writing >>> ' + str(counter) + ' <<< tweets to this file:' + str(currentTargetFile)
       allMergedTweetsCount = allMergedTweetsCount + counter
       # clear currentTargetTweetsList[] after writing its contents to file
       currentTargetTweetsList = []
@@ -772,10 +797,10 @@ def mergeJSONfiles(sourceDir,targetDir):
       # reset k because target file is incremented to a new file
       k = 0
     i += 1
-  printAndLog('Unflushed tweet buffer (tweets not written to file): ' + str(len(currentTargetTweetsList)),statusLogFN)
-  printAndLog('Total number of UNREADABLE source files: ' + str(unreadableCount),statusLogFN)
-  printAndLog('Total number of source files read: ' + str(totalSourceFilesReadCount),statusLogFN)
-  printAndLog('Total number of tweets read from source files: ' + str(totalSourceTweetsReadCount),statusLogFN)
+  printAndLog('Unflushed tweet buffer (tweets not written to file): ' + str(len(currentTargetTweetsList)), statusLogFN)
+  printAndLog('Total number of UNREADABLE source files: ' + str(unreadableCount), statusLogFN)
+  printAndLog('Total number of source files read: ' + str(totalSourceFilesReadCount), statusLogFN)
+  printAndLog('Total number of tweets read from source files: ' + str(totalSourceTweetsReadCount), statusLogFN)
   return allMergedTweetsCount
 
 def getStringFromJSONTweet(jsonTweet):
@@ -832,7 +857,8 @@ def getStringFromJSONTweet(jsonTweet):
     if jsonTweet['tweet_in_reply_to_status_id'] == None:
       inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_status_id":null'
     else:
-      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_status_id":' + str(jsonTweet['tweet_in_reply_to_status_id'])
+      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_status_id":' + str(
+        jsonTweet['tweet_in_reply_to_status_id'])
   # tweet_in_reply_to_user_id
   if 'tweet_in_reply_to_user_id' in jsonTweet:
     if not firstElement:
@@ -841,7 +867,8 @@ def getStringFromJSONTweet(jsonTweet):
     if jsonTweet['tweet_in_reply_to_user_id'] == None:
       inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_user_id":null'
     else:
-      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_user_id":' + str(jsonTweet['tweet_in_reply_to_user_id'])
+      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_user_id":' + str(
+        jsonTweet['tweet_in_reply_to_user_id'])
   # tweet_in_reply_to_screen_name
   if 'tweet_in_reply_to_screen_name' in jsonTweet:
     if not firstElement:
@@ -850,7 +877,8 @@ def getStringFromJSONTweet(jsonTweet):
     if jsonTweet['tweet_in_reply_to_screen_name'] == None:
       inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_screen_name":null'
     else:
-      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_screen_name":"' + jsonTweet['tweet_in_reply_to_screen_name'] + '"'
+      inputJSONAsString = inputJSONAsString + '"tweet_in_reply_to_screen_name":"' + jsonTweet[
+        'tweet_in_reply_to_screen_name'] + '"'
   # retweet_count
   if 'retweet_count' in jsonTweet:
     if not firstElement:
@@ -865,7 +893,8 @@ def getStringFromJSONTweet(jsonTweet):
       inputJSONAsString = inputJSONAsString + '"tweet_geo":null'
     else:
       tweet_geo_type = jsonTweet['tweet_geo']['type']
-      tweet_geo_coordinates = '[' +  str(jsonTweet['tweet_geo']['coordinates'][0]) + ',' + str(jsonTweet['tweet_geo']['coordinates'][1]) + ']'
+      tweet_geo_coordinates = '[' + str(jsonTweet['tweet_geo']['coordinates'][0]) + ',' + str(
+        jsonTweet['tweet_geo']['coordinates'][1]) + ']'
       inputJSONAsString = inputJSONAsString + '"tweet_geo":{"type":"' + tweet_geo_type + '","coordinates":' + tweet_geo_coordinates + '}'
   if 'tweet_coordinates' in jsonTweet:
     if not firstElement:
@@ -875,7 +904,7 @@ def getStringFromJSONTweet(jsonTweet):
       inputJSONAsString = inputJSONAsString + '"tweet_coordinates":null'
     else:
       tweet_coordinates_type = jsonTweet['tweet_coordinates']['type']
-      tweet_coordinates_coordinates = ('[' +  str(jsonTweet['tweet_coordinates']['coordinates'][0]) + ','
+      tweet_coordinates_coordinates = ('[' + str(jsonTweet['tweet_coordinates']['coordinates'][0]) + ','
                                        + str(jsonTweet['tweet_coordinates']['coordinates'][1]) + ']')
       inputJSONAsString = (inputJSONAsString + '"tweet_coordinates":{"type":"' + tweet_coordinates_type
                            + '","coordinates":' + tweet_coordinates_coordinates + '}')
@@ -894,14 +923,14 @@ def getStringFromJSONTweet(jsonTweet):
       tp_id = jsonTweet['tweet_place']['id']
       tp_name = jsonTweet['tweet_place']['name']
       inputJSONAsString = (inputJSONAsString + '"tweet_place":{'
-                          + '"country_code":"' + tp_country_code + '",'
-                          + '"url":"' + tp_url + '",'
-                          + '"country":"' + tp_country + '",'
-                          + '"place_type":"' + tp_place_type + '",'
-                          + '"full_name":"' + tp_full_name + '",'
-                          + '"id":"' + tp_id + '",'
-                          + '"name":"' + tp_name + '"'
-                          + '}')
+                           + '"country_code":"' + tp_country_code + '",'
+                           + '"url":"' + tp_url + '",'
+                           + '"country":"' + tp_country + '",'
+                           + '"place_type":"' + tp_place_type + '",'
+                           + '"full_name":"' + tp_full_name + '",'
+                           + '"id":"' + tp_id + '",'
+                           + '"name":"' + tp_name + '"'
+                           + '}')
   if 'user_mentions' in jsonTweet:
     if not firstElement:
       inputJSONAsString = inputJSONAsString + ','
@@ -912,8 +941,8 @@ def getStringFromJSONTweet(jsonTweet):
       um_screen_name = jsonTweet['user_mentions'][um_count]['um_screen_name']
       um_id = jsonTweet['user_mentions'][um_count]['um_id']
       inputJSONAsString = (inputJSONAsString + '{"um_screen_name":"' + um_screen_name + '",'
-                          + '"um_id":"' + str(um_id) + '"'
-                          + '},')
+                           + '"um_id":"' + str(um_id) + '"'
+                           + '},')
       um_count += 1
     if um_count > 0:
       # remove final comma from set of user mentions, and add a closing bracket
@@ -958,9 +987,9 @@ def getStringFromJSONTweet(jsonTweet):
     inputJSONAsString = inputJSONAsString + '}'
   return inputJSONAsString
 
-def printAndLog(msg,logFile):
+def printAndLog(msg, logFile):
   print msg
-  f = open(logFile,'a')
+  f = open(logFile, 'a')
   f.write(msg + '\n')
   f.close()
   return
@@ -1003,16 +1032,18 @@ def main():
         print 'Processing raw input file: ' + item
         extractedTweets = tainhale(rawInputDir + '\\' + item)
         print 'Saving extracted tweets to directory: ' + cleanTrimmedJsonDir
-        cleanSaveToFilename = cleanTrimmedJsonDir+ '\\' + item
-        saveListAsFileJSON(extractedTweets,cleanSaveToFilename)
+        cleanSaveToFilename = cleanTrimmedJsonDir + '\\' + item
+        saveListAsFileJSON(extractedTweets, cleanSaveToFilename)
     endInhaleTime = time.time()
   if deduplicate:
-    printAndLog('De-duplicating ' + str(totalTweetsInCleanData) + ' cleaned and trimmed tweets in ' + str(totalCleanDataFiles) + ' files from dir: ' + str(cleanTrimmedJsonDir),statusLogFN)
+    printAndLog('De-duplicating ' + str(totalTweetsInCleanData) + ' cleaned and trimmed tweets in ' + str(
+      totalCleanDataFiles) + ' files from dir: ' + str(cleanTrimmedJsonDir), statusLogFN)
     startDeduplicationTime = time.time()
-    deduplicateTweets(cleanTrimmedJsonDir,deduplicatedJsonDir)
+    deduplicateTweets(cleanTrimmedJsonDir, deduplicatedJsonDir)
     endDeduplicationTime = time.time()
-    printAndLog('De-duplication complete. Results in dir: ' + str(deduplicatedJsonDir),statusLogFN)
-    printAndLog('Total time to deduplicate cleaned/trimmed data: ' + str(endDeduplicationTime - startDeduplicationTime) + ' seconds.',statusLogFN)
+    printAndLog('De-duplication complete. Results in dir: ' + str(deduplicatedJsonDir), statusLogFN)
+    printAndLog('Total time to deduplicate cleaned/trimmed data: ' + str(
+      endDeduplicationTime - startDeduplicationTime) + ' seconds.', statusLogFN)
     print 'Logging deduplication checks...'
     # here, write a number of lists and a dict collected during de-duplication to disk
     # listOfTweetIdsMarkedForDeduplication
@@ -1020,27 +1051,28 @@ def main():
     # dictOfFilesFromWhichDuplicatesRemoved
     # listOfCleanedTweetFilesDiscardedAsUnreadableJSON
     print 'Logging tweet IDs marked for deduplication...'
-    f = open(markedForDedupLogFN,'a')
+    f = open(markedForDedupLogFN, 'a')
     i = 0
     for i in xrange(len(listOfTweetIdsMarkedForDeduplication)):
       f.write(str(listOfTweetIdsMarkedForDeduplication[i]) + '\n')
       i += 1
     f.close()
     print 'Logging tweet IDs popped (discarded) from JSON files due to duplication...'
-    f = open(tweetIdsPoppedFromDeduplicatedJSONLogFN,'a')
+    f = open(tweetIdsPoppedFromDeduplicatedJSONLogFN, 'a')
     i = 0
     for i in xrange(len(listOfTweetIdsPoppedFromDeduplicatedJSON)):
       f.write(str(listOfTweetIdsPoppedFromDeduplicatedJSON[i]) + '\n')
       i += 1
     f.close()
-    printAndLog('dictOfFilesFromWhichDuplicatesRemoved length: ' + str(len(dictOfFilesFromWhichDuplicatesRemoved)),statusLogFN)
+    printAndLog('dictOfFilesFromWhichDuplicatesRemoved length: ' + str(len(dictOfFilesFromWhichDuplicatesRemoved)),
+                statusLogFN)
     print 'Logging filenames and associated counts of tweets discarded due to duplication...'
-    f = open(deduplicationCountsByFileLogFN,'a')
+    f = open(deduplicationCountsByFileLogFN, 'a')
     for key in sorted(dictOfFilesFromWhichDuplicatesRemoved.keys()):
       f.write(str(key) + ' : ' + str(dictOfFilesFromWhichDuplicatesRemoved[key]) + '\n')
     f.close()
     print 'Logging filenames discarded due to unreadable JSON...'
-    f = open(filesDiscardedLogFN,'a')
+    f = open(filesDiscardedLogFN, 'a')
     i = 0
     for i in xrange(len(listOfCleanedTweetFilesDiscardedAsUnreadableJSON)):
       f.write(str(listOfCleanedTweetFilesDiscardedAsUnreadableJSON[i]) + '\n')
@@ -1049,11 +1081,11 @@ def main():
     print 'Logging deduplication checks complete.'
   if testDeduplicate:
     startTestDeduplicationTime = time.time()
-    printAndLog('Building list of Tweet IDs from all files in directory: ' + str(deduplicatedJsonDir),statusLogFN)
+    printAndLog('Building list of Tweet IDs from all files in directory: ' + str(deduplicatedJsonDir), statusLogFN)
     listOfTweetIds = getAllTweetIds(deduplicatedJsonDir)
-    printAndLog('Completed: list of Tweet IDs from all files in: ' + str(deduplicatedJsonDir),statusLogFN)
-    printAndLog('Checking single occurrence of tweets removed as duplicates in final set',statusLogFN)
-    f = open(tweetIdsPoppedFromDeduplicatedJSONLogFN,'rU')
+    printAndLog('Completed: list of Tweet IDs from all files in: ' + str(deduplicatedJsonDir), statusLogFN)
+    printAndLog('Checking single occurrence of tweets removed as duplicates in final set', statusLogFN)
+    f = open(tweetIdsPoppedFromDeduplicatedJSONLogFN, 'rU')
     missingTweetCount = 0
     missingTweets = []
     for line in f:
@@ -1064,46 +1096,57 @@ def main():
         print 'Cannot find this tweet in the final set: ' + str(duplicatedTweetId)
     f.close()
     if missingTweetCount == 0:
-      printAndLog('Success! All tweets removed as duplicates exist (presumably once) in final, deduplicated data set.',statusLogFN)
+      printAndLog('Success! All tweets removed as duplicates exist (presumably once) in final, deduplicated data set.',
+                  statusLogFN)
     else:
-      printAndLog('Sorry! There are this many missing tweets: ' + str(missingTweetCount),statusLogFN)
+      printAndLog('Sorry! There are this many missing tweets: ' + str(missingTweetCount), statusLogFN)
     # deduplicateTweets(deduplicatedJsonDir,testDeduplicatedJsonDir)
     endTestDeduplicationTime = time.time()
-    printAndLog('De-duplication testing complete.',statusLogFN)
+    printAndLog('De-duplication testing complete.', statusLogFN)
   print ' ----------------------------------- '
   if aggregate:
     ###############################################################
     # aggregate deduplicated tweets into fewer, larger files
     ###############################################################
     startMergeTime = time.time()
-    printAndLog('Merging files from: ' + str(deduplicatedJsonDir),statusLogFN)
-    mergedTweetCount = mergeJSONfiles(deduplicatedJsonDir,mergeDir)
-    printAndLog('Merged files (' + str(mergedTweetCount)  + ' tweets) located in: ' + str(mergeDir),statusLogFN)
+    printAndLog('Merging files from: ' + str(deduplicatedJsonDir), statusLogFN)
+    mergedTweetCount = mergeJSONfiles(deduplicatedJsonDir, mergeDir)
+    printAndLog('Merged files (' + str(mergedTweetCount) + ' tweets) located in: ' + str(mergeDir), statusLogFN)
     endMergeTime = time.time()
     ###############################################################
     # build a file containing the text of all tweets collected
     ###############################################################
-    printAndLog('Building file of all Tweets from files in directory: ' + str(deduplicatedJsonDir),statusLogFN)
+    printAndLog('Building file of all Tweets from files in directory: ' + str(deduplicatedJsonDir), statusLogFN)
     listOfAllTweets = aggregateAllTweets(deduplicatedJsonDir)
     thisFN = 'AllTweets.txt'
     allTweetsFN = resultsDir + '\\' + thisFN
-    saveListAsFile(listOfAllTweets,allTweetsFN)
+    saveListAsFile(listOfAllTweets, allTweetsFN)
   if ingest:
-    printAndLog('Total time to ingest/clean/trim raw data: ' + str(endInhaleTime - startInhaleTime) + ' seconds.',statusLogFN)
+    printAndLog('Total time to ingest/clean/trim raw data: ' + str(endInhaleTime - startInhaleTime) + ' seconds.',
+                statusLogFN)
   if testDeduplicate:
-    saveListAsFile(listOfTweetIds,allTweetIdsDeduplicatedLogFN)
-    printAndLog('Total time to TEST deduplicate previously de-duplicated data: ' + str(endTestDeduplicationTime - startTestDeduplicationTime) + ' seconds.',statusLogFN)
+    saveListAsFile(listOfTweetIds, allTweetIdsDeduplicatedLogFN)
+    printAndLog('Total time to TEST deduplicate previously de-duplicated data: ' + str(
+      endTestDeduplicationTime - startTestDeduplicationTime) + ' seconds.', statusLogFN)
   if aggregate:
-    printAndLog('Total time to MERGE de-duplicated data: ' + str(endMergeTime - startMergeTime) + ' seconds.',statusLogFN)
-  printAndLog(' ----------------------------------- ',statusLogFN)
-  printAndLog('Total number of cleaned/trimmed tweets: ' + str(totalTweetsInCleanData),statusLogFN)
-  printAndLog(' ----------------------------------- ',statusLogFN)
-  printAndLog('Total number of files containing cleaned/trimmed tweets: ' + str(totalCleanDataFiles),statusLogFN)
-  printAndLog('Total time spent validating data while ingesting/cleaning/trimming: ' + str(timeSpentValidatingData) + ' seconds.',statusLogFN)
-  printAndLog('Total number of tweets or tweet-fragments discarded during validation: ' + str(totalDiscardedTweetsOrFragments),statusLogFN)
-  printAndLog('Total number of files discarded during de-duplication (did not open as JSON): ' + str(totalDiscardedDataFiles),statusLogFN)
-  printAndLog('Total number of tweets detected as duplicates and discarded: ' + str(totalDiscardedDuplicateTweets),statusLogFN)
-  printAndLog('END OF RUN',statusLogFN)
+    printAndLog('Total time to MERGE de-duplicated data: ' + str(endMergeTime - startMergeTime) + ' seconds.',
+                statusLogFN)
+  printAndLog(' ----------------------------------- ', statusLogFN)
+  printAndLog('Total number of cleaned/trimmed tweets: ' + str(totalTweetsInCleanData), statusLogFN)
+  printAndLog(' ----------------------------------- ', statusLogFN)
+  printAndLog('Total number of files containing cleaned/trimmed tweets: ' + str(totalCleanDataFiles), statusLogFN)
+  printAndLog(
+    'Total time spent validating data while ingesting/cleaning/trimming: ' + str(timeSpentValidatingData) + ' seconds.',
+    statusLogFN)
+  printAndLog(
+    'Total number of tweets or tweet-fragments discarded during validation: ' + str(totalDiscardedTweetsOrFragments),
+    statusLogFN)
+  printAndLog(
+    'Total number of files discarded during de-duplication (did not open as JSON): ' + str(totalDiscardedDataFiles),
+    statusLogFN)
+  printAndLog('Total number of tweets detected as duplicates and discarded: ' + str(totalDiscardedDuplicateTweets),
+              statusLogFN)
+  printAndLog('END OF RUN', statusLogFN)
 
 if __name__ == '__main__':
   main()
