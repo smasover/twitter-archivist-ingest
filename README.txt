@@ -5,4 +5,3 @@ The code corrects for harvested JSON files that are abruptly truncated (harveste
 The code has not been generalized. It is an artifact of a specific data-harvesting experiment. It was written by a Python novice, caveat emptor....
 
 Copyright in the code is held by The Regents of the University of California; and is released under an ECL 2.0 License (cf. LICENCE.txt).
-
